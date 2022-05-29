@@ -28,7 +28,9 @@ public class FilterTest extends FilterBase {
         return resultCount;
     }
 
-    /** Make test compatible with older version of ant. */
+    /**
+     * Make test compatible with older version of ant.
+     */
     public static junit.framework.Test suite() {
         return new junit.framework.JUnit4TestAdapter(FilterTest.class);
     }
