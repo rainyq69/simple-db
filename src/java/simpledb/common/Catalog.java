@@ -22,13 +22,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Threadsafe
  */
 public class Catalog {
+    private static final List<DbFile> files = new ArrayList<DbFile>();
+    private static final List<String> names = new ArrayList<String>();
+    private static final List<String> pks = new ArrayList<String>();
 
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
-        // some code goes here
+        files.clear();
+        names.clear();
+        pks.clear();
     }
 
     /**
@@ -42,7 +47,9 @@ public class Catalog {
      * @param pkeyField the name of the primary key field
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+        files.add(file);
+        names.add(name);
+        pks.add(pkeyField);
     }
 
     public void addTable(DbFile file, String name) {
@@ -67,8 +74,12 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // some code goes here
-        return 0;
+        for (int i = files.size() - 1; i >= 0; i--) {
+            if (Objects.equals(names.get(i), name)) {
+                return files.get(i).getId();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -79,8 +90,12 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        for (int i = files.size() - 1; i >= 0; i--) {
+            if (files.get(i).getId() == tableid) {
+                return files.get(i).getTupleDesc();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -91,30 +106,47 @@ public class Catalog {
      *                function passed to addTable
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        for (int i = files.size() - 1; i >= 0; i--) {
+            if (files.get(i).getId() == tableid) {
+                return files.get(i);
+            }
+        }
+        throw new NoSuchElementException();
     }
 
-    public String getPrimaryKey(int tableid) {
-        // some code goes here
-        return null;
+    public String getPrimaryKey(int tableid) throws NoSuchElementException {
+        for (int i = files.size() - 1; i >= 0; i--) {
+            if (files.get(i).getId() == tableid) {
+                return pks.get(i);
+            }
+        }
+        throw new NoSuchElementException();
+    }
+
+    public String getTableName(int tableid) throws NoSuchElementException {
+        for (int i = files.size() - 1; i >= 0; i--) {
+            if (files.get(i).getId() == tableid) {
+                return names.get(i);
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     public Iterator<Integer> tableIdIterator() {
-        // some code goes here
-        return null;
-    }
-
-    public String getTableName(int id) {
-        // some code goes here
-        return null;
+        List<Integer> tids = new ArrayList<Integer>();
+        for (DbFile file : files) {
+            tids.add(file.getId());
+        }
+        return tids.iterator();
     }
 
     /**
      * Delete all tables from the catalog
      */
     public void clear() {
-        // some code goes here
+        files.clear();
+        names.clear();
+        pks.clear();
     }
 
     /**
@@ -140,17 +172,14 @@ public class Catalog {
                 for (String e : els) {
                     String[] els2 = e.trim().split(" ");
                     names.add(els2[0].trim());
-                    if (els2[1].trim().equalsIgnoreCase("int"))
-                        types.add(Type.INT_TYPE);
-                    else if (els2[1].trim().equalsIgnoreCase("string"))
-                        types.add(Type.STRING_TYPE);
+                    if (els2[1].trim().equalsIgnoreCase("int")) types.add(Type.INT_TYPE);
+                    else if (els2[1].trim().equalsIgnoreCase("string")) types.add(Type.STRING_TYPE);
                     else {
                         System.out.println("Unknown type " + els2[1]);
                         System.exit(0);
                     }
                     if (els2.length == 3) {
-                        if (els2[2].trim().equals("pk"))
-                            primaryKey = els2[0].trim();
+                        if (els2[2].trim().equals("pk")) primaryKey = els2[0].trim();
                         else {
                             System.out.println("Unknown annotation " + els2[2]);
                             System.exit(0);
