@@ -9,6 +9,7 @@ import simpledb.transaction.TransactionId;
 
 import java.io.*;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,6 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Threadsafe, all fields are final
  */
 public class BufferPool {
+    private int numPages;
+    private List<Page> pages;
+
     /**
      * Bytes per page, including header.
      */
@@ -43,7 +47,7 @@ public class BufferPool {
      * @param numPages maximum number of pages in this buffer pool.
      */
     public BufferPool(int numPages) {
-        // some code goes here
+        this.numPages = numPages;
     }
 
     public static int getPageSize() {
@@ -77,8 +81,8 @@ public class BufferPool {
      */
     public Page getPage(TransactionId tid, PageId pid, Permissions perm)
             throws TransactionAbortedException, DbException {
-        // some code goes here
-        return null;
+        DbFile dbFile = Database.getCatalog().getDatabaseFile(pid.getTableId());
+        return dbFile.readPage(pid);
     }
 
     /**

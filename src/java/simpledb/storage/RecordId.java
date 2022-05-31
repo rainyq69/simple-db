@@ -1,6 +1,7 @@
 package simpledb.storage;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A RecordId is a reference to a specific tuple on a specific page of a
@@ -38,26 +39,16 @@ public class RecordId implements Serializable {
         return this.pageId;
     }
 
-    /**
-     * Two RecordId objects are considered equal if they represent the same
-     * tuple.
-     *
-     * @return True if this and o represent the same tuple
-     */
     @Override
     public boolean equals(Object o) {
-        return (this.tupleNo == ((RecordId) o).tupleNo) && (this.pageId == ((RecordId) o).pageId);
+        if (this == o) return true;
+        if (!(o instanceof RecordId)) return false;
+        RecordId recordId = (RecordId) o;
+        return tupleNo == recordId.tupleNo && pageId.equals(recordId.pageId);
     }
 
-    /**
-     * You should implement the hashCode() so that two equal RecordId instances
-     * (with respect to equals()) have the same hashCode().
-     *
-     * @return An int that is the same for equal RecordId objects.
-     */
     @Override
     public int hashCode() {
-        return tupleNo + 256 * pageId.getPageNumber() + 256 * 256 * pageId.getTableId();
+        return Objects.hash(pageId, tupleNo);
     }
-
 }
